@@ -45,7 +45,7 @@ std::vector<int> MpVector(std::vector<int> & x)
 	std::vector<int> y;
 	for (iter= x.begin(); iter != x.end(); iter++)
 	{
-		y.push_back(*iter  *  *iter);
+		y.push_back(*iter * *iter);
 
 	}
 	return y;
