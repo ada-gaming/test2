@@ -16,6 +16,8 @@ int main()
 			std::cout << "NePokemon\n";
 		}
 
+
+		std::cout << "Who is Pokemon?\n";
 	return 0;
 
 }
