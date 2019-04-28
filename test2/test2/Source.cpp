@@ -6,7 +6,7 @@ int main()
 {
 	for (int i = 0; i < 10; i++) std::cout << "Ada Gaming\n";
 	std::cout << "Hello GitHub\n";
-	int a;
+	int a, b;
 		std:: cout << "Hello GitHub\n";
 		std::cin >> a;
 		if (a == 1) {
@@ -15,7 +15,8 @@ int main()
 		else {
 			std::cout << "NePokemon\n";
 		}
-
+		std::cin >> b;
+		std::cout >> b;
 	return 0;
 
 }
