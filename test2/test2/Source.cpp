@@ -1,68 +1,181 @@
 #include<iostream>
 #include<vector>
-#include<string>
+#include<set>
 
-using std::string;
-void myFunc(int x);
-std::vector<int> MpVector(std::vector<int> & x);
-
-int main()
+using namespace std;
+template<typename T>
+class Tree
 {
+	struct Node
+	{
+		T date = {};
+		Node* left = 0;
+		Node* right = 0;
+		Node* father = 0;
+		int deep=0;
+	};
+	set<Node*> doneWay;
+	Node* root;
+	Node* maxDeep;
 
+public:
+	Tree();
+	~Tree();
+	void addNode(T date);
+	void Max();
 
-	for (int i = 0; i < 10; i++) std::cout << "Ada Gaming\n";
-	std::cout << "Hello GitHub\n";
-	int a=0;
-	string b;
-		std:: cout << "Hello GitHub\n";
-		std::cin >> a;
-		if (a == 1) {
-			std::cout << "Pokemon\n";
-		}
-		else {
-			std::cout << "NePokemon\n";
-		}
-		myFunc(20);
-
-		std::cout << "Who is Pokemon?\n";
-		std::cin >> b;
-		std::cout << b;
-		int x=0;
-		std::vector<int> old;
-		std::cout<<"Enter numbers\n\"q\" for Exit\n";
-		while (std::cin>>x)
+private:
+	void DellNode(Node* node);
+	void DellTree(Node* node);
+	void MaxDeep(Node* node);
+	vector<Node*> MaxWay(Node* start)
+	{
+		vector<Node*>l;
+		vector<Node*>r;
+		vector<Node*>f;
+		if (start)
 		{
-			old.push_back(x);
+			doneWay.insert(start);
+			if (bool is_in = doneWay.find(start->left) == doneWay.end())			l = MaxWay(start->left);
+			if (bool is_in = doneWay.find(start->right) == doneWay.end())			r = MaxWay(start->right);
+			if (bool is_in = doneWay.find(start->father) == doneWay.end())		    f = MaxWay(start->father);
+			if (l.size() > r.size())
+			{
+				if (l.size() > f.size())
+				{
+					l.push_back(start);
+					return l;
+				}
+				else
+				{
+					f.push_back(start);
+					return f;
+				}
+			}
+			else
+			{
+				if (r.size() > f.size())
+				{
+					r.push_back(start);
+					return r;
+				}
+				else
+				{
+					f.push_back(start);
+					return f;
+				}
+			}
 		}
-		std::cout << "sqrt yours vector\n";
-		std::vector<int> n=MpVector(old);
-		for (int i = 0; i < n.size(); i++)
-		{
-			std::cout << n[i] << std::endl;
-		}
-		std::cout << b;
+		else return l;
+	}
+};
+
+
+
+int main()                                          //MAIN
+{
+	int firstTree[] = { 52,43,57,36,56,70,21,53,7,30,54,55 };
+	Tree<int> fTree;
+	for (auto i : firstTree)
+	{
+		fTree.addNode(i);
+	}
+	fTree.Max();
 	return 0;
-
 }
 
-void myFunc(int x)
+template<typename T>
+Tree<T>::Tree()
 {
-	if (x != 0)
+	this->root = 0;
+	maxDeep = 0;
+}
+
+template<typename T>
+Tree<T>::~Tree()
+{
+	DellTree(root);
+}
+
+template<typename T>
+void Tree<T>::addNode(T _date)
+{
+	if (!root)
 	{
-		std::cout << "Hello\t" << x << std::endl;
-		myFunc(x - 5);
+		this->root = new Node;
+		this->root->date = _date;
+		this->root->deep = 1;
+		this->maxDeep = this->root;
+	}
+	else
+	{
+		bool done = false;
+		Node* temp = this->root;
+		while (!done)
+		{
+			if (temp->date < _date)
+			{
+				if (temp->right) temp = temp->right;
+				else
+				{
+					temp->right = new Node;
+					temp->right->date = _date;
+					temp->right->deep = temp->deep + 1;
+					temp->right->father = temp;
+					MaxDeep(temp->right);
+					done = true;
+				}
+			}
+			else if (temp->date > _date)
+			{
+				if (temp->left) temp = temp->left;
+				else
+				{
+					temp->left = new Node;
+					temp->left->date = _date;
+					temp->left->deep = temp->deep + 1;
+					temp->left->father = temp;
+					MaxDeep(temp->left);
+					done = true;
+				}
+			}
+			else done = true;
+		}
+
 	}
 }
-}
 
-std::vector<int> MpVector(std::vector<int> & x)
+template<typename T>
+void Tree<T>::Max()
 {
-	std::vector<int>::iterator iter;
-	std::vector<int> y;
-	for (iter= x.begin(); iter != x.end(); iter++)
+	vector<Node*>a = MaxWay(maxDeep);
+	for (auto i : a)
 	{
-		y.push_back(*iter * *iter);
-
+		cout << i->date << endl;
 	}
-	return y;
+
 }
+
+template<typename T>
+void Tree<T>::DellNode(Node* node)
+{
+
+}
+
+template<typename T>
+void Tree<T>::DellTree(Node* node)
+{
+	if (node != nullptr)
+	{
+		DellTree(node->left);
+		DellTree(node->right);
+		delete node;
+	}
+}
+
+template<typename T>
+void Tree<T>::MaxDeep(Node* node)
+{
+	if (maxDeep->deep < node->deep) maxDeep = node;
+}
+
