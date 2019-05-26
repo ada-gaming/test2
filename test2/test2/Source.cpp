@@ -3,10 +3,10 @@
 #include<set>
 
 using namespace std;
-template<typename T>
+template<typename T>                     //Шаблонный класс дерева для работы с любыми видами переменных (которые поддреживают операторы сравнения)
 class Tree
 {
-	struct Node
+	struct Node                          //Структура Ноды
 	{
 		T date = {};
 		Node* left = 0;
@@ -14,21 +14,22 @@ class Tree
 		Node* father = 0;
 		int deep = 0;
 	};
-	set<Node*> doneWay;
-	Node* root;
-	Node* maxDeep;
+	set<Node*> doneWay;               //Множество посещенных нод
+	Node* root;                       //указатель на корень дерева
+	Node* maxDeep;                    //Указатель на листовую ноду с максимальной глубинной
 
 public:
-	Tree();
-	~Tree();
-	void addNode(T date);
-	void Max();
-	void dell() { DellNode(root); }
+	Tree();                          //Конструктор без параметров
+	~Tree();                         //Деструктор для удаления дерева и высвобаждения памяти
+	void addNode(T date);            //Добавление ноды
+	void Pre_order();                //обход дерева для вывода
+	void Max();                      //публичная Функция которая вызывает  приватную рекурсивную функцию для поиска самого длинного пути
+
 private:
-	void DellNode(Node* node);
-	void DellTree(Node* node);
-	void MaxDeep(Node* node);
-	vector<Node*> MaxWay(Node* start)
+	void DellNode(Node* node);      //Функция удаления ноды
+	void DellTree(Node* node);      //Функция для удаления дерева
+	void MaxDeep(Node* node);      //расчитываем максимальную глубинну дерева (для старта поиска самого длинного пути)
+	vector<Node*> MaxWay(Node* start)           // Функция рекурисвно возвращает пути от вызванной ноды (что в конце дас нам самый длинный путь )
 	{
 		vector<Node*>l;
 		vector<Node*>r;
@@ -67,29 +68,41 @@ private:
 			}
 		}
 		else return l;
-	}
+	}  
 };
 
 
-int main()                                          //MAIN
+int main() //-------------------------------------------------------------------MAIN------------------------------------------------
 {
-	int firstTree[] = { 52,43,57,36,56,70,21,53,7,30,54,55 };
+	//-------Три массива для проверок------------------------------------------------------
+	int firstTree[] = { 52,43,57,36,56,70,21,53,7,30,54,55 };                               
 	int secondTree[] = { 101,73,137,45,92,145,34,77,97,140,151,21,74,81,1,27,79,86,23,90 };
 	int thirdTree[] = { 55,110,220,49 };
-	cout << "We have three Tree\nChoise one \n1-----:";
+	//--------------------------------------------------------------------------------------
+	cout << "We have three sequences for submitting data to a binary tree\nChoise one \n1-----:";
 	for (int i : firstTree) cout << i << ' ';
 	cout <<endl << "2-----:";
 	for (int i : secondTree) cout << i << ' ';
 	cout << endl<<"3-----:" ;
 	for (int i : thirdTree) cout << i << ' ';
 	cout << endl << endl << endl;
+	int choise;
+	cin >> choise;
+
+	//-------Создание бинарного дерево из выбранного массива-------------------------------
 	Tree<int> fTree;
-	for (auto i : secondTree)
+	for (auto i : firstTree)
 	{
 		fTree.addNode(i);
 	}
+	//------------------------------------------------------------------------------------
+
+	//------Поиск максимального пути(ширины) дерева с последующим удалением среднего элемента этого пути
+	cout << "\nFind the width of the tree\n";
 	fTree.Max();
 	cout << endl << endl << endl;
+	//-------------------------------------------------------------------------------------
+
 
 	return 0;
 }
@@ -162,8 +175,9 @@ void Tree<T>::Max()
 	vector<Node*>a = MaxWay(maxDeep);
 	for (auto i : a)
 	{
-		cout << i->date << endl;
+		cout << i->date << ' ';
 	}
+
 	int d = a.size() / 2;
 	cout << "Node " << a[d]->date << " dell" << endl;
 	DellNode(a[d]);
@@ -180,6 +194,7 @@ void Tree<T>::DellNode(Node* node)
 			if (node->father->left == node) node->father->left = 0;
 			else node->father->right = 0;
 		}
+		else this->root = 0;
 		delete node;
 		return;
 	}
@@ -200,7 +215,6 @@ void Tree<T>::DellNode(Node* node)
 		Node* ptr = node->right;
 		if (ptr->left == 0)
 		{
-			ptr->father = node->father;
 			if (node->left != 0)
 			{
 				ptr->left = node->left;
@@ -210,6 +224,7 @@ void Tree<T>::DellNode(Node* node)
 			{
 				if (node->father->left == node) node->father->left = ptr;
 				else node->father->right = ptr;
+				ptr->father = node->father;
 			}
 
 			delete node;
@@ -227,13 +242,23 @@ void Tree<T>::DellNode(Node* node)
 				ptr->right->father = ptr->father;
 			}
 			else ptr->father->left = 0;
+			if (node->father != 0)
+			{
+				if (node->father->left == node) node->father->left = ptr;
+				else node->father->right = ptr;
 				ptr->father = node->father;
+			}
 
 			if (ptr->father == 0) this->root = ptr;
-			ptr->left = node->left;
+			if (node->left != 0)
+			{
+				ptr->left = node->left;
+				node->left->father = ptr;
+			}
 			ptr->right = node->right;
 			node->right->father = ptr;
-			node->left->father = ptr;
+
+
 			delete node;
 			return;
 
