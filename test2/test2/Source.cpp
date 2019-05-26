@@ -12,7 +12,7 @@ class Tree
 		Node* left = 0;
 		Node* right = 0;
 		Node* father = 0;
-		int deep=0;
+		int deep = 0;
 	};
 	set<Node*> doneWay;
 	Node* root;
@@ -23,7 +23,7 @@ public:
 	~Tree();
 	void addNode(T date);
 	void Max();
-
+	void dell() { DellNode(root); }
 private:
 	void DellNode(Node* node);
 	void DellTree(Node* node);
@@ -71,16 +71,26 @@ private:
 };
 
 
-
 int main()                                          //MAIN
 {
 	int firstTree[] = { 52,43,57,36,56,70,21,53,7,30,54,55 };
+	int secondTree[] = { 101,73,137,45,92,145,34,77,97,140,151,21,74,81,1,27,79,86,23,90 };
+	int thirdTree[] = { 55,110,220,49 };
+	cout << "We have three Tree\nChoise one \n1-----:";
+	for (int i : firstTree) cout << i << ' ';
+	cout <<endl << "2-----:";
+	for (int i : secondTree) cout << i << ' ';
+	cout << endl<<"3-----:" ;
+	for (int i : thirdTree) cout << i << ' ';
+	cout << endl << endl << endl;
 	Tree<int> fTree;
-	for (auto i : firstTree)
+	for (auto i : secondTree)
 	{
 		fTree.addNode(i);
 	}
 	fTree.Max();
+	cout << endl << endl << endl;
+
 	return 0;
 }
 
@@ -148,22 +158,92 @@ void Tree<T>::addNode(T _date)
 template<typename T>
 void Tree<T>::Max()
 {
+	this->doneWay.clear();
 	vector<Node*>a = MaxWay(maxDeep);
 	for (auto i : a)
 	{
 		cout << i->date << endl;
 	}
+	int d = a.size() / 2;
+	cout << "Node " << a[d]->date << " dell" << endl;
+	DellNode(a[d]);
 
 }
 
 template<typename T>
 void Tree<T>::DellNode(Node* node)
 {
+	if ((node->left == 0) && (node->right == 0))
+	{
+		if (node->father != 0)
+		{
+			if (node->father->left == node) node->father->left = 0;
+			else node->father->right = 0;
+		}
+		delete node;
+		return;
+	}
+	else if (node->right == 0)
+	{
+		if (node->father != 0)
+		{
+			if (node->father->left == node) node->father->left = node->left;
+			else node->father->right = node->left;
+			node->left->father = node->father;
+		}
+		else this->root = node->left;
+		delete node;
+		return;
+	}
+	else
+	{
+		Node* ptr = node->right;
+		if (ptr->left == 0)
+		{
+			ptr->father = node->father;
+			if (node->left != 0)
+			{
+				ptr->left = node->left;
+				node->left->father = ptr;
+			}
+			if (node->father != 0)
+			{
+				if (node->father->left == node) node->father->left = ptr;
+				else node->father->right = ptr;
+			}
+
+			delete node;
+			return;
+		}
+		else
+		{
+			while (ptr->left != 0)
+			{
+				ptr = ptr->left;
+			}
+			if (ptr->right != 0)
+			{
+				ptr->father->left = ptr->right;
+				ptr->right->father = ptr->father;
+			}
+			else ptr->father->left = 0;
+				ptr->father = node->father;
+
+			if (ptr->father == 0) this->root = ptr;
+			ptr->left = node->left;
+			ptr->right = node->right;
+			node->right->father = ptr;
+			node->left->father = ptr;
+			delete node;
+			return;
+
+		}
+	}
 
 }
 
 template<typename T>
-void Tree<T>::DellTree(Node* node)
+void Tree<T>::DellTree(Node * node)
 {
 	if (node != nullptr)
 	{
@@ -174,7 +254,7 @@ void Tree<T>::DellTree(Node* node)
 }
 
 template<typename T>
-void Tree<T>::MaxDeep(Node* node)
+void Tree<T>::MaxDeep(Node * node)
 {
 	if (maxDeep->deep < node->deep) maxDeep = node;
 }
