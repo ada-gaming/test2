@@ -22,10 +22,10 @@ public:
 	Tree();                          //Конструктор без параметров
 	~Tree();                         //Деструктор для удаления дерева и высвобаждения памяти
 	void addNode(T date);            //Добавление ноды
-	void Pre_order();                //обход дерева для вывода
 	void Max();                      //публичная Функция которая вызывает  приватную рекурсивную функцию для поиска самого длинного пути
 
 private:
+	void Pre_order(Node *node);                //обход дерева для вывода
 	void DellNode(Node* node);      //Функция удаления ноды
 	void DellTree(Node* node);      //Функция для удаления дерева
 	void MaxDeep(Node* node);      //расчитываем максимальную глубинну дерева (для старта поиска самого длинного пути)
@@ -71,38 +71,77 @@ private:
 	}  
 };
 
+template<typename T>
+void Create_Tree(Tree <T>* t, int* ptr, int size)
+{
+	for (int i=0;i<size;i++)
+	{
+		int a = *(ptr + i);
+		t->addNode(a);
+	}
+}
 
 int main() //-------------------------------------------------------------------MAIN------------------------------------------------
 {
 	//-------Три массива для проверок------------------------------------------------------
-	int firstTree[] = { 52,43,57,36,56,70,21,53,7,30,54,55 };                               
+	int firstTree[] = { 52,43,57,36,56,70,21,53,7,30,54,55,48,75,41 };
 	int secondTree[] = { 101,73,137,45,92,145,34,77,97,140,151,21,74,81,1,27,79,86,23,90 };
-	int thirdTree[] = { 55,110,220,49 };
+	int thirdTree[] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
 	//--------------------------------------------------------------------------------------
-	cout << "We have three sequences for submitting data to a binary tree\nChoise one \n1-----:";
-	for (int i : firstTree) cout << i << ' ';
-	cout <<endl << "2-----:";
-	for (int i : secondTree) cout << i << ' ';
-	cout << endl<<"3-----:" ;
-	for (int i : thirdTree) cout << i << ' ';
-	cout << endl << endl << endl;
-	int choise;
-	cin >> choise;
-
-	//-------Создание бинарного дерево из выбранного массива-------------------------------
-	Tree<int> fTree;
-	for (auto i : firstTree)
+	int choise=5;
+	while (choise!=0)
 	{
-		fTree.addNode(i);
+
+		int* pointer = 0;
+
+		int sizeArray;
+
+		cout << "We have three sequences for submitting data to a binary tree\nChoise one or input 0 for exit \n1-----:";
+		for (int i : firstTree) cout << i << ' ';
+		cout << endl << "2-----:";
+		for (int i : secondTree) cout << i << ' ';
+		cout << endl << "3-----:";
+		for (int i : thirdTree) cout << i << ' ';
+		cout << endl << endl << endl;
+
+		cin >> choise;
+		switch (choise)
+		{
+		case 0: cout << "Exit" << endl; break;
+		case 1:
+			pointer = firstTree;
+			sizeArray = size(firstTree);
+			break;
+		case 2:
+			pointer = secondTree;
+			sizeArray = size(secondTree);
+			break;
+		case 3:
+			pointer = thirdTree;
+			sizeArray = size(thirdTree);
+			break;
+
+		default:
+			cout << "Wrong Input" << endl;
+			break;
+		}
+		//-------Создание бинарного дерево из выбранного массива-------------------------------else pointer не равен 0
+		if (pointer) {
+			Tree<int> fTree;
+			Create_Tree(&fTree, pointer, sizeArray);
+			//------------------------------------------------------------------------------------
+			//------Поиск максимального пути(ширины) дерева с последующим удалением среднего элемента этого пути
+			cout << "######################################################################################\n";
+			cout << "\nFind the width of the tree\n";
+			fTree.Max();
+			cout << "######################################################################################\n";
+			cout << endl << endl << endl;
+
+			//-------------------------------------------------------------------------------------
+
+		}
+
 	}
-	//------------------------------------------------------------------------------------
-
-	//------Поиск максимального пути(ширины) дерева с последующим удалением среднего элемента этого пути
-	cout << "\nFind the width of the tree\n";
-	fTree.Max();
-	cout << endl << endl << endl;
-	//-------------------------------------------------------------------------------------
-
 
 	return 0;
 }
@@ -169,10 +208,29 @@ void Tree<T>::addNode(T _date)
 }
 
 template<typename T>
+void Tree<T>::Pre_order(Node *node)
+{
+	if (node)
+	{
+		cout << node->date << ' ';
+		Pre_order(node->left);
+		Pre_order(node->right);
+	}
+	else return;
+	
+}
+
+template<typename T>
 void Tree<T>::Max()
 {
+	if (!root)
+	{
+		cout << "Tree is empty\n";
+		return;
+	}
 	this->doneWay.clear();
 	vector<Node*>a = MaxWay(maxDeep);
+	cout << "Max Way" << endl;
 	for (auto i : a)
 	{
 		cout << i->date << ' ';
@@ -181,7 +239,9 @@ void Tree<T>::Max()
 	int d = a.size() / 2;
 	cout << "Node " << a[d]->date << " dell" << endl;
 	DellNode(a[d]);
-
+	cout << "Tree output------------------------------------------------\n";
+	Pre_order(root);
+	cout << "\n-----------------------------------------------------------\n";
 }
 
 template<typename T>
